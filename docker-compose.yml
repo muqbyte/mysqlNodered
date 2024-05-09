@@ -1,0 +1,44 @@
+version:"3"
+
+services:
+  backend:
+    image: nodered/node-red
+    restart: always
+    container_name: nr
+    ports:
+      - "1888:1880"
+    environment:
+      TZ: Asia/Kuala_Lumpur
+      NODE_RED_ENABLE_PROJECTS: "true"
+      NODE_RED_ENABLE_SAFE_MODE: "false"
+    command: npm install node-red-dashboard node-red-node-mysql
+    networks:
+      - net-backend
+      - net-web
+
+  mysql:
+    image: mariadb
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+    container_name: sql
+    environment:
+      MYSQL_ROOT_PASSWORD: digitalman
+      MYSQL_DATABASE: digitalman
+      MYSQL_USER: digitalman
+      MYSQL_PASSWORD: digitalman
+      TZ: Asia/Kuala_Lumpur
+    ports:
+      - "3333:3306"
+    networks:
+      net-backend
+
+networks:
+  net-backend:
+    name: net-exp-db
+  net-web:
+    name: net-web-all
+
+volumes:
+  db_data:
